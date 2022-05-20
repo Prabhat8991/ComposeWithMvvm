@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.app.imdbclone.network.CoroutineDispatcherProvider
 import com.app.imdbclone.network.MovieRepository
+import com.app.imdbclone.network.Repository
 import com.app.imdbclone.ui.state.MovieUIState
 import com.app.imdbclone.ui.state.MovieUiData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MovieViewModel @Inject constructor(
-    private val movieRepository: MovieRepository,
+    private val movieRepository: Repository,
     private val coroutineDispatcherProvider: CoroutineDispatcherProvider
 ) :
     ViewModel() {
@@ -31,7 +32,7 @@ class MovieViewModel @Inject constructor(
     }
 
     private fun getMovies() {
-        viewModelScope.launch(coroutineDispatcherProvider.IO()) {
+        viewModelScope.launch(coroutineDispatcherProvider.IO) {
             try {
                 val response = movieRepository.fetchMovies()
                 cacheFullList = response.items.map {
@@ -48,7 +49,7 @@ class MovieViewModel @Inject constructor(
     }
 
     fun filterMovies(searchText: String) {
-        viewModelScope.launch(coroutineDispatcherProvider.IO()) {
+        viewModelScope.launch(coroutineDispatcherProvider.IO) {
             flow {
                 emit(searchText)
             }.debounce(3000).collect { target ->

@@ -1,12 +1,10 @@
 package com.app.imdbclone.network
 
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 
-class CoroutineDispatcherProvider {
-
-    fun IO() = Dispatchers.IO
-
-    fun Default() = Dispatchers.Default
-
-    fun Main() = Dispatchers.Main
-}
+data class CoroutineDispatcherProvider (
+    val IO: CoroutineDispatcher = Dispatchers.IO,
+    val DEFAULT: CoroutineDispatcher = Dispatchers.Default,
+    val  MAIN: CoroutineDispatcher = Dispatchers.Main
+)
