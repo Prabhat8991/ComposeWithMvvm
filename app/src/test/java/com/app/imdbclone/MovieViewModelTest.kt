@@ -9,6 +9,7 @@ import com.app.imdbclone.ui.state.MovieUIState
 import com.app.imdbclone.ui.state.MovieUiData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -26,13 +27,6 @@ class MovieViewModelTest {
     private val movieRepository = mock<MovieRepository>()
     private lateinit var movieViewModel: MovieViewModel
 
-    @get:Rule
-    val mainCoroutineRule = CoroutineTestRule()
-
-    private val testDispatcher = CoroutineDispatcherProvider(
-        IO = TestCoroutineDispatcher()
-    )
-
     @Before
     fun setUp() {
         movieViewModel = MovieViewModel(movieRepository, CoroutineDispatcherProvider())
@@ -48,9 +42,11 @@ class MovieViewModelTest {
             year = "",
             crew = ""
         ))
-      runBlocking {
+      runTest {
+          val dispatcher = StandardTestDispatcher(testScheduler)
           whenever(movieRepository.fetchMovies()).thenReturn(MovieResponse(items = mockList))
-          movieViewModel = MovieViewModel(movieRepository, testDispatcher)
+          movieViewModel = MovieViewModel(movieRepository, CoroutineDispatcherProvider(IO = dispatcher))
+          advanceUntilIdle()
           Assert.assertEquals(MovieUIState.Content(mutableListOf(
               MovieUiData(imageUrl = "img", title = "Movie"))),movieViewModel.uiState.value
           )
